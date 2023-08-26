@@ -1,44 +1,37 @@
 package cli
 
-import (
-	"fmt"
-	"os"
-)
-
 type Command struct {
-	Name        string
-	Description string
-	Callback    func() error
+	name        string
+	description string
+	callback    func(*Config) error
+}
+
+type Config struct {
+	nextLocationAreas *string
+	prevLocationAreas *string
 }
 
 func getCommands() map[string]Command {
 	return map[string]Command{
 		"help": {
-			Name:        "help",
-			Description: "Displays help message",
-			Callback:    handleHelp,
+			name:        "help",
+			description: "Displays help message",
+			callback:    handleHelp,
+		},
+		"map": {
+			name:        "map",
+			description: "Displays next set of location areas",
+			callback:    handleMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Displays previous set of location areas",
+			callback:    handleMapb,
 		},
 		"exit": {
-			Name:        "exit",
-			Description: "Exits Pokedex",
-			Callback:    handleExit,
+			name:        "exit",
+			description: "Exits Pokedex",
+			callback:    handleExit,
 		},
 	}
-}
-
-func handleHelp() (err error) {
-	fmt.Print("\nWelcome to Pokedex\n")
-	fmt.Print("\nUsage:\n\n")
-
-	for key, val := range getCommands() {
-		fmt.Printf("%s: %s\n", key, val.Description)
-	}
-
-	fmt.Println()
-	return
-}
-
-func handleExit() (err error) {
-	os.Exit(0)
-	return
 }

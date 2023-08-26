@@ -10,6 +10,12 @@ func StartREPL() {
 	scanner := bufio.NewScanner(os.Stdin)
 	commands := getCommands()
 
+	url := "https://pokeapi.co/api/v2/location-area"
+	config := Config{
+		nextLocationAreas: &url,
+		prevLocationAreas: nil,
+	}
+
 	for {
 		fmt.Print("pokedex > ")
 		scanner.Scan()
@@ -26,7 +32,7 @@ func StartREPL() {
 			continue
 		}
 
-		if err := cmd.Callback(); err != nil {
+		if err := cmd.callback(&config); err != nil {
 			fmt.Println(err)
 			continue
 		}
