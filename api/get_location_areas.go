@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"io"
-	"net/http"
 )
 
 type LocationAreasResponse struct {
@@ -17,7 +16,14 @@ type LocationAreasResponse struct {
 }
 
 func GetLocationAreas(url string) (LocationAreasResponse, error) {
-	res, err := http.Get(url)
+	if body, inCache := client.cache.Get(url); inCache {
+		var locAreas LocationAreasResponse
+		json.Unmarshal(body, &locAreas)
+
+		return locAreas, nil
+	}
+
+	res, err := client.http.Get(url)
 	if err != nil {
 		return LocationAreasResponse{}, err
 	}
@@ -26,6 +32,7 @@ func GetLocationAreas(url string) (LocationAreasResponse, error) {
 	if err != nil {
 		return LocationAreasResponse{}, err
 	}
+	go client.cache.Add(url, body)
 
 	var locAreas LocationAreasResponse
 	json.Unmarshal(body, &locAreas)
