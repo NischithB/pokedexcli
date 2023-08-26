@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+
+	"github.com/NischithB/pokedexcli/utils"
 )
 
 func StartREPL() {
@@ -20,7 +22,7 @@ func StartREPL() {
 		fmt.Print("pokedex > ")
 		scanner.Scan()
 
-		cmdLine := formatCmd(scanner.Text())
+		cmdLine := utils.FormatCmd(scanner.Text())
 
 		if len(cmdLine) == 0 {
 			continue

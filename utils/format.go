@@ -1,8 +1,8 @@
-package cli
+package utils
 
 import "strings"
 
-func formatCmd(c string) []string {
+func FormatCmd(c string) []string {
 	c = strings.ToLower(c)
 	return strings.Fields(c)
 }
