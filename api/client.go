@@ -14,5 +14,5 @@ type APIClient struct {
 
 var client = APIClient{
 	http:  http.Client{Timeout: time.Second * time.Duration(5)},
-	cache: cache.NewCache(time.Second * time.Duration(10)),
+	cache: cache.NewCache(time.Second * time.Duration(20)),
 }

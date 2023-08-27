@@ -8,7 +8,7 @@ import (
 	"github.com/NischithB/pokedexcli/api"
 )
 
-func handleHelp(_ *Config) (err error) {
+func handleHelp(cfg *Config, args ...string) (err error) {
 	fmt.Print("\nWelcome to Pokedex\n")
 	fmt.Print("\nUsage:\n\n")
 
@@ -20,7 +20,7 @@ func handleHelp(_ *Config) (err error) {
 	return
 }
 
-func handleMap(cfg *Config) (err error) {
+func handleMap(cfg *Config, args ...string) (err error) {
 	if cfg.nextLocationAreas == nil {
 		fmt.Println("You have reached the end")
 		return
@@ -44,7 +44,7 @@ func handleMap(cfg *Config) (err error) {
 	return
 }
 
-func handleMapb(cfg *Config) (err error) {
+func handleMapb(cfg *Config, args ...string) (err error) {
 	if cfg.prevLocationAreas == nil {
 		fmt.Println("You are at start")
 		return
@@ -67,7 +67,26 @@ func handleMapb(cfg *Config) (err error) {
 	return
 }
 
-func handleExit(_ *Config) (err error) {
+func handleExplore(cfg *Config, args ...string) (err error) {
+	if len(args) < 1 {
+		log.Printf("'area' is missing, 1 argument needed: 'explore {area}'")
+		return
+	}
+
+	pokes, err := api.GetPokemonsInArea(args[0])
+
+	if err != nil {
+		log.Printf("failed to display pokemons in %s", args[0])
+	}
+
+	for _, poke := range pokes.PokemonEncounters {
+		fmt.Println(poke.Pokemon.Name)
+	}
+
+	return
+}
+
+func handleExit(cfg *Config, args ...string) (err error) {
 	os.Exit(0)
 	return
 }

@@ -34,7 +34,8 @@ func StartREPL() {
 			continue
 		}
 
-		if err := cmd.callback(&config); err != nil {
+		args := cmdLine[1:]
+		if err := cmd.callback(&config, args...); err != nil {
 			fmt.Println(err)
 			continue
 		}
