@@ -5,25 +5,15 @@ import (
 	"io"
 )
 
-type LocationAreasResponse struct {
-	Count    int     `json:"count"`
-	Next     *string `json:"next"`
-	Previous *string `json:"previous"`
-	Results  []struct {
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	} `json:"results"`
-}
-
-func GetLocationAreas(url string) (LocationAreasResponse, error) {
-	if body, inCache := client.cache.Get(url); inCache {
+func (services *Services) GetLocationAreas(url string) (LocationAreasResponse, error) {
+	if body, inCache := services.Cache.Get(url); inCache {
 		var locAreas LocationAreasResponse
 		json.Unmarshal(body, &locAreas)
 
 		return locAreas, nil
 	}
 
-	res, err := client.http.Get(url)
+	res, err := services.HttpClient.Get(url)
 	if err != nil {
 		return LocationAreasResponse{}, err
 	}
@@ -32,10 +22,20 @@ func GetLocationAreas(url string) (LocationAreasResponse, error) {
 	if err != nil {
 		return LocationAreasResponse{}, err
 	}
-	go client.cache.Add(url, body)
+	go services.Cache.Add(url, body)
 
 	var locAreas LocationAreasResponse
 	json.Unmarshal(body, &locAreas)
 
 	return locAreas, nil
+}
+
+type LocationAreasResponse struct {
+	Count    int     `json:"count"`
+	Next     *string `json:"next"`
+	Previous *string `json:"previous"`
+	Results  []struct {
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	} `json:"results"`
 }

@@ -3,8 +3,12 @@ package cli
 import (
 	"bufio"
 	"fmt"
+	"net/http"
 	"os"
+	"time"
 
+	"github.com/NischithB/pokedexcli/api"
+	"github.com/NischithB/pokedexcli/cache"
 	"github.com/NischithB/pokedexcli/utils"
 )
 
@@ -14,6 +18,11 @@ func StartREPL() {
 
 	url := "https://pokeapi.co/api/v2/location-area"
 	config := Config{
+		services: api.Services{
+			HttpClient: http.Client{Timeout: time.Second * time.Duration(5)},
+			Cache:      cache.NewCache(time.Second * time.Duration(20)),
+			PokeStore:  map[string]api.Pokemon{},
+		},
 		nextLocationAreas: &url,
 		prevLocationAreas: nil,
 	}

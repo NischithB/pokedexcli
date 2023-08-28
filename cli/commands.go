@@ -6,11 +6,6 @@ type Command struct {
 	callback    func(*Config, ...string) error
 }
 
-type Config struct {
-	nextLocationAreas *string
-	prevLocationAreas *string
-}
-
 func getCommands() map[string]Command {
 	return map[string]Command{
 		"help": {
@@ -32,6 +27,11 @@ func getCommands() map[string]Command {
 			name:        "explore",
 			description: "Displays all the Pokemon in the given area",
 			callback:    handleExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Tries to catch the given Pokemon",
+			callback:    handleCatch,
 		},
 		"exit": {
 			name:        "exit",

@@ -6,6 +6,32 @@ import (
 	"io"
 )
 
+func (services *Services) GetPokemonsInArea(area string) (PokemonsInAreaResponse, error) {
+	url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/%s", area)
+
+	if body, inCache := services.Cache.Get(url); inCache {
+		var pokes PokemonsInAreaResponse
+		json.Unmarshal(body, &pokes)
+
+		return pokes, nil
+	}
+
+	res, err := services.HttpClient.Get(url)
+	if err != nil {
+		return PokemonsInAreaResponse{}, err
+	}
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return PokemonsInAreaResponse{}, err
+	}
+	go services.Cache.Add(url, body)
+
+	var pokes PokemonsInAreaResponse
+	json.Unmarshal(body, &pokes)
+	return pokes, nil
+}
+
 type PokemonsInAreaResponse struct {
 	EncounterMethodRates []struct {
 		EncounterMethod struct {
@@ -57,30 +83,4 @@ type PokemonsInAreaResponse struct {
 			} `json:"version"`
 		} `json:"version_details"`
 	} `json:"pokemon_encounters"`
-}
-
-func GetPokemonsInArea(area string) (PokemonsInAreaResponse, error) {
-	url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/%s", area)
-
-	if body, inCache := client.cache.Get(url); inCache {
-		var pokes PokemonsInAreaResponse
-		json.Unmarshal(body, &pokes)
-
-		return pokes, nil
-	}
-
-	res, err := client.http.Get(url)
-	if err != nil {
-		return PokemonsInAreaResponse{}, err
-	}
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return PokemonsInAreaResponse{}, err
-	}
-	go client.cache.Add(url, body)
-
-	var pokes PokemonsInAreaResponse
-	json.Unmarshal(body, &pokes)
-	return pokes, nil
 }

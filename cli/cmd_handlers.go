@@ -3,9 +3,8 @@ package cli
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
-
-	"github.com/NischithB/pokedexcli/api"
 )
 
 func handleHelp(cfg *Config, args ...string) (err error) {
@@ -26,7 +25,7 @@ func handleMap(cfg *Config, args ...string) (err error) {
 		return
 	}
 
-	locations, err := api.GetLocationAreas(*cfg.nextLocationAreas)
+	locations, err := cfg.services.GetLocationAreas(*cfg.nextLocationAreas)
 	if err != nil {
 		log.Printf("failed to display location areas: %v", err)
 		return
@@ -49,7 +48,7 @@ func handleMapb(cfg *Config, args ...string) (err error) {
 		fmt.Println("You are at start")
 		return
 	}
-	locations, err := api.GetLocationAreas(*cfg.prevLocationAreas)
+	locations, err := cfg.services.GetLocationAreas(*cfg.prevLocationAreas)
 	if err != nil {
 		log.Printf("failed to display location areas: %v", err)
 		return
@@ -68,21 +67,49 @@ func handleMapb(cfg *Config, args ...string) (err error) {
 }
 
 func handleExplore(cfg *Config, args ...string) (err error) {
-	if len(args) < 1 {
-		log.Printf("'area' is missing, 1 argument needed: 'explore {area}'")
+	if len(args) != 1 {
+		log.Printf("1 argument needed: 'explore {area}', %d were given", len(args))
 		return
 	}
 
-	pokes, err := api.GetPokemonsInArea(args[0])
+	fmt.Printf("Exploring %s...\n", args[0])
+	pokes, err := cfg.services.GetPokemonsInArea(args[0])
 
 	if err != nil {
-		log.Printf("failed to display pokemons in %s", args[0])
+		log.Printf("failed to display pokemons in %s\n", args[0])
 	}
 
+	fmt.Println("Found Pokemon:")
 	for _, poke := range pokes.PokemonEncounters {
-		fmt.Println(poke.Pokemon.Name)
+		fmt.Printf("  -  %s\n", poke.Pokemon.Name)
 	}
 
+	return
+}
+
+func handleCatch(cfg *Config, args ...string) (err error) {
+	if len(args) != 1 {
+		log.Printf("1 argument needed: 'catch {pokemon}', %d were given", len(args))
+		return
+	}
+	pokeName := args[0]
+
+	poke, err := cfg.services.GetPokemon(pokeName)
+	if err != nil {
+		log.Println("failed to fetch pokemon")
+		return
+	}
+
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokeName)
+	xp := rand.Intn(poke.BaseExperience)
+
+	if xp > 40 {
+		fmt.Printf("%s escaped!\n", poke.Name)
+		return nil
+	}
+
+	cfg.services.PokeStore[pokeName] = poke
+	fmt.Printf("%s was caught!\n", poke.Name)
 	return
 }
 
