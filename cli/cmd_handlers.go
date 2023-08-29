@@ -110,6 +110,7 @@ func handleCatch(cfg *Config, args ...string) (err error) {
 
 	cfg.services.PokeStore[pokeName] = poke
 	fmt.Printf("%s was caught!\n", poke.Name)
+	fmt.Println("You may now inspect it with the inspect command.")
 	return
 }
 
@@ -138,7 +139,19 @@ func handleInspect(cfg *Config, args ...string) (err error) {
 	for _, t := range poke.Types {
 		fmt.Printf("  - %s\n", t.Type.Name)
 	}
+	return
+}
 
+func handlePokedex(cfg *Config, args ...string) (err error) {
+	if len(cfg.services.PokeStore) == 0 {
+		fmt.Println("Your Pokedex is empty")
+		return
+	}
+
+	fmt.Println("Your Pokedex:")
+	for name := range cfg.services.PokeStore {
+		fmt.Println("  - ", name)
+	}
 	return
 }
 
