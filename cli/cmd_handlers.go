@@ -113,6 +113,35 @@ func handleCatch(cfg *Config, args ...string) (err error) {
 	return
 }
 
+func handleInspect(cfg *Config, args ...string) (err error) {
+	if len(args) != 1 {
+		log.Printf("1 argument needed: 'inspect {pokemon}', %d were given", len(args))
+		return
+	}
+
+	pokeName := args[0]
+	poke, isCaught := cfg.services.PokeStore[pokeName]
+	if !isCaught {
+		fmt.Println("you haven't caught this pokemon")
+		return
+	}
+
+	// Display details
+	fmt.Println("Name:", poke.Name)
+	fmt.Println("Height:", poke.Height)
+	fmt.Println("Weight:", poke.Weight)
+	fmt.Println("Stats:")
+	for _, stat := range poke.Stats {
+		fmt.Printf("  - %s: %d\n", stat.Stat.Name, stat.BaseStat)
+	}
+	fmt.Println("Types:")
+	for _, t := range poke.Types {
+		fmt.Printf("  - %s\n", t.Type.Name)
+	}
+
+	return
+}
+
 func handleExit(cfg *Config, args ...string) (err error) {
 	os.Exit(0)
 	return
